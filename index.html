@@ -14,11 +14,11 @@
     --green:#43a047;
   }
   body{
-    font-family: "Inter", system-ui, sans-serif;
+    font-family:"Inter",system-ui,sans-serif;
     margin:0;
     background:var(--bg);
     color:#222;
-    overflow-y:scroll;
+    overflow-y:auto;
     scroll-behavior:smooth;
   }
 
@@ -71,6 +71,24 @@
     transition:width 0.4s ease;
   }
 
+  /* Redeem button at top */
+  #redeemTopBtn{
+    background:#388e3c;
+    color:#fff;
+    border:none;
+    padding:10px 20px;
+    border-radius:50px;
+    font-size:15px;
+    font-weight:700;
+    cursor:not-allowed;
+    opacity:0.6;
+  }
+  #redeemTopBtn.enabled{
+    cursor:pointer;
+    opacity:1;
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  }
+
   main{
     max-width:1200px;
     margin:20px auto;
@@ -94,7 +112,7 @@
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    transition:background 0.3s ease, border-color 0.3s ease;
+    transition:background 0.3s ease,border-color 0.3s ease;
   }
   .task-card.done{
     background:#e7f9ed;
@@ -148,6 +166,15 @@
     text-align:center;
   }
 
+  /* Help link */
+  .help-link{
+    margin-top:10px;
+    display:block;
+    color:#1976d2;
+    text-decoration:none;
+    font-weight:600;
+  }
+
   @media (max-width:600px){
     header{flex-direction:column;gap:8px;}
     #progress-container{width:80vw;}
@@ -161,81 +188,85 @@
   <div id="datetime"></div>
   <div id="taskCounter">0 / 3000 completed</div>
   <div id="progress-container"><div id="progress-bar">0%</div></div>
+  <button id="redeemTopBtn" onclick="redeemReward()">Redeem ₹300</button>
 </header>
 
 <main>
   <h1>Monetized Tasks (3000)</h1>
-  <p class="lead">Click a task → complete the Linkvertise step → you’ll be redirected to <code>verify.html?id=TASK</code>. After completing verification, it turns green and records the date/time of completion.</p>
+  <p class="lead">Click a task → complete the Linkvertise step → you’ll be redirected to <code>verify.html?id=TASK</code>. After verification, it turns green with date/time.</p>
 
   <div id="tasks"></div>
 
   <div id="redeem-section">
     <h2>🎁 Redeem Tasks</h2>
-    <p>Thank you for your hard work! You can redeem rewards once you complete <strong>100 tasks</strong> or more.</p>
-    <button onclick="alert('Redemption feature coming soon!')">Redeem Now</button>
+    <p>Thank you for your hard work! You can redeem rewards once you complete <strong>3000 tasks</strong>.</p>
+    <a href="https://youtube.com/@linkvertise?si=SU07_HOoGAaDikok" target="_blank" class="help-link">📘 How to complete a task</a>
   </div>
 </main>
 
-<!-- Linkvertise -->
 <script src="https://publisher.linkvertise.com/cdn/linkvertise.js"></script>
 <script>
 try{linkvertise(1436408,{whitelist:[],blacklist:[]});}catch(e){}
 </script>
 
 <script>
-/* ---------- CONFIG ---------- */
-const TOTAL = 3000;
-const KEY_CODES = 'taskCodes';
-const KEY_VERIFIED = 'verifiedTasks';
-const KEY_TIME = 'verifiedTimes';
-const tasksEl = document.getElementById('tasks');
-const progressBarEl = document.getElementById('progress-bar');
-const counterEl = document.getElementById('taskCounter');
+const TOTAL=3000;
+const KEY_CODES='taskCodes';
+const KEY_VERIFIED='verifiedTasks';
+const KEY_TIME='verifiedTimes';
+const tasksEl=document.getElementById('tasks');
+const progressBarEl=document.getElementById('progress-bar');
+const counterEl=document.getElementById('taskCounter');
+const redeemTopBtn=document.getElementById('redeemTopBtn');
 
-/* ---------- LOAD ---------- */
-let taskCodes = JSON.parse(localStorage.getItem(KEY_CODES) || '{}');
-let verifiedTasks = JSON.parse(localStorage.getItem(KEY_VERIFIED) || '{}');
-let verifiedTimes = JSON.parse(localStorage.getItem(KEY_TIME) || '{}');
-let verifiedCount = Object.keys(verifiedTasks).length;
+let taskCodes=JSON.parse(localStorage.getItem(KEY_CODES)||'{}');
+let verifiedTasks=JSON.parse(localStorage.getItem(KEY_VERIFIED)||'{}');
+let verifiedTimes=JSON.parse(localStorage.getItem(KEY_TIME)||'{}');
+let verifiedCount=Object.keys(verifiedTasks).length;
 
-/* ---------- DATETIME CLOCK ---------- */
 function updateClock(){
-  const now = new Date();
-  document.getElementById('datetime').textContent =
-    now.toLocaleDateString() + " " + now.toLocaleTimeString();
+  const now=new Date();
+  document.getElementById('datetime').textContent=
+    now.toLocaleDateString()+" "+now.toLocaleTimeString();
 }
-setInterval(updateClock, 1000);
+setInterval(updateClock,1000);
 updateClock();
 
-/* ---------- UI Updates ---------- */
 function updateProgressUI(){
-  const pct = Math.round((verifiedCount/TOTAL)*100);
-  progressBarEl.style.width = pct+"%";
-  progressBarEl.textContent = `${pct}% (${verifiedCount}/${TOTAL})`;
-  counterEl.textContent = `${verifiedCount} / ${TOTAL} completed`;
+  const pct=Math.round((verifiedCount/TOTAL)*100);
+  progressBarEl.style.width=pct+"%";
+  progressBarEl.textContent=`${pct}% (${verifiedCount}/${TOTAL})`;
+  counterEl.textContent=`${verifiedCount} / ${TOTAL} completed`;
+
+  if(verifiedCount>=3000){
+    redeemTopBtn.classList.add('enabled');
+    redeemTopBtn.disabled=false;
+    redeemTopBtn.style.cursor='pointer';
+  }else{
+    redeemTopBtn.classList.remove('enabled');
+    redeemTopBtn.disabled=true;
+  }
 }
 
-/* ---------- Mark Verified ---------- */
 function markVerified(id){
-  if(verifiedTasks[id]) return;
-  verifiedTasks[id] = true;
-  verifiedTimes[id] = new Date().toLocaleString();
-  localStorage.setItem(KEY_VERIFIED, JSON.stringify(verifiedTasks));
-  localStorage.setItem(KEY_TIME, JSON.stringify(verifiedTimes));
-  verifiedCount = Object.keys(verifiedTasks).length;
+  if(verifiedTasks[id])return;
+  verifiedTasks[id]=true;
+  verifiedTimes[id]=new Date().toLocaleString();
+  localStorage.setItem(KEY_VERIFIED,JSON.stringify(verifiedTasks));
+  localStorage.setItem(KEY_TIME,JSON.stringify(verifiedTimes));
+  verifiedCount=Object.keys(verifiedTasks).length;
 
-  const card = document.getElementById('task-card-'+id);
+  const card=document.getElementById('task-card-'+id);
   if(card){
     card.classList.add('done');
-    const right = card.querySelector('.right');
-    right.innerHTML = `<span class="verified-badge">Verified</span> <span class="time-stamp">${verifiedTimes[id]}</span>`;
+    const right=card.querySelector('.right');
+    right.innerHTML=`<span class="verified-badge">Verified</span> <span class="time-stamp">${verifiedTimes[id]}</span>`;
   }
   updateProgressUI();
 }
 
-/* ---------- Build Tasks ---------- */
 for(let i=1;i<=TOTAL;i++){
-  const card = document.createElement('div');
+  const card=document.createElement('div');
   card.className='task-card';
   card.id='task-card-'+i;
 
@@ -261,15 +292,15 @@ for(let i=1;i<=TOTAL;i++){
     input.value=taskCodes[i]||'';
     input.disabled=true;
     right.innerHTML=`<span class="verified-badge">Verified</span> <span class="time-stamp">${verifiedTimes[i]||''}</span>`;
-  } else {
+  }else{
     const btn=document.createElement('button');
     btn.className='verify';
     btn.textContent='Verify';
     btn.addEventListener('click',()=>{
       const entered=(input.value||'').trim();
-      if(taskCodes[i] && entered===taskCodes[i]){
+      if(taskCodes[i]&&entered===taskCodes[i]){
         markVerified(i);
-      } else {
+      }else{
         btn.textContent='Invalid';
         setTimeout(()=>btn.textContent='Verify',800);
       }
@@ -282,16 +313,15 @@ for(let i=1;i<=TOTAL;i++){
   tasksEl.appendChild(card);
 }
 
-/* ---------- Auto verify handler ---------- */
 (function(){
   const p=new URLSearchParams(location.search);
   const auto=p.get('autoVerify');
   const id=p.get('id');
-  if(auto==='1' && id){
+  if(auto==='1'&&id){
     taskCodes=JSON.parse(localStorage.getItem(KEY_CODES)||'{}');
     if(taskCodes[id]){
       const inp=document.getElementById('input-'+id);
-      if(inp) inp.value=taskCodes[id];
+      if(inp)inp.value=taskCodes[id];
       markVerified(id);
       history.replaceState(null,'',location.pathname);
       setTimeout(()=>alert(`Task ${id} verified.`),300);
@@ -299,15 +329,22 @@ for(let i=1;i<=TOTAL;i++){
   }
 })();
 
-/* ---------- Cross-tab sync ---------- */
 window.addEventListener('storage',e=>{
-  if(e.key===KEY_CODES) taskCodes=JSON.parse(e.newValue||'{}');
-  if(e.key===KEY_VERIFIED) {
+  if(e.key===KEY_CODES)taskCodes=JSON.parse(e.newValue||'{}');
+  if(e.key===KEY_VERIFIED){
     verifiedTasks=JSON.parse(e.newValue||'{}');
     verifiedCount=Object.keys(verifiedTasks).length;
     updateProgressUI();
   }
 });
+
+function redeemReward(){
+  if(verifiedCount<3000){
+    alert("Complete all 3000 tasks to redeem ₹300!");
+  }else{
+    alert("🎉 Congratulations! You’ve successfully redeemed ₹300.");
+  }
+}
 
 updateProgressUI();
 </script>

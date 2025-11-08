@@ -2,197 +2,160 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Task Verification Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Verification</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #fff;
+      text-align: center;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #f0f9ff, #cbebff);
-      color: #222;
-      overflow-y: scroll; /* ✅ Enables scrolling in mobile */
     }
-    header {
-      background: #007bff;
-      color: white;
-      padding: 10px;
-      text-align: center;
-      position: sticky;
+
+    h1 {
+      margin-top: 70px;
+      font-size: 28px;
+    }
+
+    /* Progress bar */
+    #progress-container {
+      position: fixed;
       top: 0;
-      z-index: 10;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background-color: #333;
     }
-    #dateTime {
-      font-size: 14px;
-      margin-top: 4px;
-    }
-    .progress-container {
-      width: 90%;
-      background: #ddd;
-      border-radius: 20px;
-      margin: 10px auto;
-      height: 25px;
-      overflow: hidden;
-    }
-    .progress-bar {
+
+    #progress-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #28a745, #00c853);
-      transition: width 0.3s;
+      background-color: #4CAF50;
+      transition: width 0.3s ease;
     }
-    #tasksCompleted {
-      text-align: center;
-      margin-top: 5px;
+
+    /* Task counter */
+    #taskCounter {
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #222;
+      padding: 8px 16px;
+      border-radius: 10px;
       font-weight: bold;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
     }
-    .task-list {
+
+    /* Task list */
+    #tasks {
+      margin-top: 120px;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding-bottom: 50px;
     }
+
     .task {
-      width: 90%;
-      background: #fff;
-      padding: 10px;
-      margin: 5px;
+      background-color: #1f1f1f;
+      border: 1px solid #333;
       border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      width: 130px;
+      padding: 15px;
+      color: #fff;
+      transition: all 0.2s ease;
     }
+
     .task.completed {
-      background: #d4edda;
-      color: #155724;
+      background-color: #2ecc71;
+      color: #000;
     }
-    .task button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .task button:hover {
-      background: #0056b3;
-    }
-    #redeemButton {
-      background: gold;
-      color: black;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      cursor: not-allowed;
-      margin: 10px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    #redeemButton.active {
-      cursor: pointer;
-      background: linear-gradient(90deg, #ffc107, #ff9800);
-    }
-    #tutorial {
-      text-align: center;
-      margin-top: 10px;
-    }
-    #tutorial a {
-      color: #007bff;
+
+    .task a {
+      display: block;
       text-decoration: none;
+      color: #4CAF50;
       font-weight: bold;
+      margin-top: 8px;
     }
-    #tutorial a:hover {
-      text-decoration: underline;
-    }
-    @media (max-width: 600px) {
-      .task { flex-direction: column; text-align: center; }
-      .task button { margin-top: 5px; width: 100%; }
+
+    .task.completed a {
+      color: #000;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h2>Complete Tasks to Earn Rewards 💎</h2>
-    <div id="dateTime"></div>
-    <button id="redeemButton" disabled>Redeem ₹300</button>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-    <div id="tasksCompleted">0 / 3000 Tasks Completed</div>
-  </header>
+  <div id="progress-container"><div id="progress-bar"></div></div>
+  <div id="taskCounter">Tasks Completed: 0 / 1000</div>
 
-  <div id="tutorial">
-    <a href="https://youtube.com/@linkvertise?si=SU07_HOoGAaDikok" target="_blank">
-      📘 How to complete a task
-    </a>
-  </div>
-
-  <div class="task-list" id="taskList"></div>
+  <h1>Complete the Tasks Below</h1>
+  <div id="tasks"></div>
 
   <script>
-    const totalTasks = 3000;
-    let completed = parseInt(localStorage.getItem("completedTasks")) || 0;
+    const totalTasks = 1000;
+    const tasksContainer = document.getElementById('tasks');
+    const taskCounter = document.getElementById('taskCounter');
+    const progressBar = document.getElementById('progress-bar');
 
-    const taskList = document.getElementById("taskList");
-    const progressBar = document.getElementById("progressBar");
-    const tasksCompleted = document.getElementById("tasksCompleted");
-    const redeemButton = document.getElementById("redeemButton");
-
-    function updateDateTime() {
-      const now = new Date();
-      document.getElementById("dateTime").textContent = now.toLocaleString();
-    }
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
+    // Load saved progress
+    let completedTasks = JSON.parse(localStorage.getItem('completedTasks')) || [];
 
     function updateProgress() {
-      const percent = (completed / totalTasks) * 100;
-      progressBar.style.width = percent + "%";
-      tasksCompleted.textContent = `${completed} / ${totalTasks} Tasks Completed`;
-      if (completed >= totalTasks) {
-        redeemButton.disabled = false;
-        redeemButton.classList.add("active");
-      }
-      localStorage.setItem("completedTasks", completed);
+      const completedCount = completedTasks.length;
+      taskCounter.textContent = `Tasks Completed: ${completedCount} / ${totalTasks}`;
+      const progress = (completedCount / totalTasks) * 100;
+      progressBar.style.width = progress + '%';
     }
 
-    redeemButton.addEventListener("click", () => {
-      if (completed >= totalTasks) {
-        alert("🎉 Congratulations! You’ve earned ₹300!");
+    function markCompleted(id) {
+      if (!completedTasks.includes(id)) {
+        completedTasks.push(id);
+        localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+        updateProgress();
+      }
+    }
+
+    // Generate 1000 tasks
+    for (let i = 1; i <= totalTasks; i++) {
+      const taskDiv = document.createElement('div');
+      taskDiv.classList.add('task');
+      taskDiv.id = `task-${i}`;
+      taskDiv.innerHTML = `
+        <div>Task ${i}</div>
+        <a href="verify.html?id=${i}" target="_blank">Open Task</a>
+      `;
+      if (completedTasks.includes(i)) {
+        taskDiv.classList.add('completed');
+        taskDiv.innerHTML = `
+          <div>Task ${i} ✅</div>
+        `;
+      }
+      tasksContainer.appendChild(taskDiv);
+    }
+
+    // Detect when user returns from verify page
+    window.addEventListener('focus', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const verifiedTask = urlParams.get('verified');
+      if (verifiedTask) {
+        markCompleted(Number(verifiedTask));
+        const el = document.getElementById(`task-${verifiedTask}`);
+        if (el) {
+          el.classList.add('completed');
+          el.innerHTML = `<div>Task ${verifiedTask} ✅</div>`;
+        }
+        history.replaceState(null, '', window.location.pathname);
       }
     });
 
-    for (let i = 1; i <= totalTasks; i++) {
-      const div = document.createElement("div");
-      div.classList.add("task");
-      if (i <= completed) div.classList.add("completed");
-
-      const taskLink = document.createElement("button");
-      taskLink.textContent = "Open Task " + i;
-      taskLink.addEventListener("click", () => {
-        window.open("https://linkvertise.com/verify.html?task=" + i, "_blank");
-        div.classList.add("completed");
-        completed++;
-        updateProgress();
-
-        // Save the completion time
-        const now = new Date().toLocaleString();
-        div.querySelector(".task-time").textContent = now;
-      });
-
-      const timeSpan = document.createElement("span");
-      timeSpan.classList.add("task-time");
-      timeSpan.style.fontSize = "12px";
-      timeSpan.style.color = "#555";
-      timeSpan.textContent = i <= completed ? new Date().toLocaleString() : "";
-
-      div.appendChild(taskLink);
-      div.appendChild(timeSpan);
-      taskList.appendChild(div);
-    }
-
     updateProgress();
   </script>
+
 </body>
 </html>

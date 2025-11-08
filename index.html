@@ -1,315 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>3000 Linkvertise Tasks — Dashboard</title>
-
-<style>
-  :root{
-    --bg:#f4f6f8;
-    --card:#fff;
-    --muted:#555;
-    --accent:#1976d2;
-    --green:#43a047;
-  }
-  body{
-    font-family: "Inter", system-ui, sans-serif;
-    margin:0;
-    background:var(--bg);
-    color:#222;
-    overflow-y:scroll;
-    scroll-behavior:smooth;
-  }
-
-  /* Header */
-  header{
-    position:sticky;
-    top:0;
-    z-index:1000;
-    background:#fff;
-    border-bottom:1px solid #ddd;
-    padding:12px 18px;
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    justify-content:center;
-    gap:15px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.05);
-  }
-  #datetime{
-    font-weight:600;
-    color:var(--muted);
-    font-size:15px;
-  }
-  #taskCounter{
-    background:var(--accent);
-    color:#fff;
-    padding:8px 14px;
-    border-radius:50px;
-    font-weight:700;
-    box-shadow:0 2px 8px rgba(25,118,210,0.15);
-  }
-  #progress-container{
-    width:420px;
-    max-width:70vw;
-    height:26px;
-    background:#e6ecf5;
-    border-radius:20px;
-    overflow:hidden;
-  }
-  #progress-bar{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#43a047,#66bb6a);
-    color:#fff;
-    font-size:13px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    transition:width 0.4s ease;
-  }
-
-  main{
-    max-width:1200px;
-    margin:20px auto;
-    padding:10px 20px 100px;
-  }
-  h1{margin-top:0;}
-  p.lead{color:var(--muted)}
-
-  /* Task grid */
-  #tasks{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-    gap:10px;
-  }
-  .task-card{
-    background:var(--card);
-    border:1px solid #d0d7df;
-    padding:10px;
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    transition:background 0.3s ease, border-color 0.3s ease;
-  }
-  .task-card.done{
-    background:#e7f9ed;
-    border-color:#81c784;
-  }
-
-  a.tasklink{
-    padding:6px 12px;
-    background:#fff;
-    border:1px solid #cddbe8;
-    border-radius:8px;
-    color:var(--accent);
-    text-decoration:none;
-    font-weight:600;
-  }
-  input.code{
-    width:80px;
-    padding:5px;
-    border:1px solid #ccc;
-    border-radius:8px;
-  }
-  button.verify{
-    padding:7px 10px;
-    border:none;
-    border-radius:8px;
-    background:var(--accent);
-    color:#fff;
-    cursor:pointer;
-  }
-  .verified-badge{
-    background:#2e7d32;
-    color:#fff;
-    padding:6px 10px;
-    border-radius:999px;
-    font-weight:700;
-    border:1px solid #1b5e20;
-  }
-  .time-stamp{
-    font-size:12px;
-    color:#444;
-    margin-left:6px;
-  }
-
-  /* Redeem section */
-  #redeem-section{
-    background:#fff;
-    padding:20px;
-    border-radius:10px;
-    margin-top:40px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.05);
-    text-align:center;
-  }
-
-  @media (max-width:600px){
-    header{flex-direction:column;gap:8px;}
-    #progress-container{width:80vw;}
-    .task-card{flex-direction:column;align-items:flex-start;}
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Task Verification Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #f0f9ff, #cbebff);
+      color: #222;
+      overflow-y: scroll; /* ✅ Enables scrolling in mobile */
+    }
+    header {
+      background: #007bff;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    #dateTime {
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    .progress-container {
+      width: 90%;
+      background: #ddd;
+      border-radius: 20px;
+      margin: 10px auto;
+      height: 25px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #28a745, #00c853);
+      transition: width 0.3s;
+    }
+    #tasksCompleted {
+      text-align: center;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 10px;
+    }
+    .task {
+      width: 90%;
+      background: #fff;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .task.completed {
+      background: #d4edda;
+      color: #155724;
+    }
+    .task button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .task button:hover {
+      background: #0056b3;
+    }
+    #redeemButton {
+      background: gold;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: not-allowed;
+      margin: 10px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    #redeemButton.active {
+      cursor: pointer;
+      background: linear-gradient(90deg, #ffc107, #ff9800);
+    }
+    #tutorial {
+      text-align: center;
+      margin-top: 10px;
+    }
+    #tutorial a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    #tutorial a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+      .task { flex-direction: column; text-align: center; }
+      .task button { margin-top: 5px; width: 100%; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <div id="datetime"></div>
-  <div id="taskCounter">0 / 3000 completed</div>
-  <div id="progress-container"><div id="progress-bar">0%</div></div>
-</header>
+  <header>
+    <h2>Complete Tasks to Earn Rewards 💎</h2>
+    <div id="dateTime"></div>
+    <button id="redeemButton" disabled>Redeem ₹300</button>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div id="tasksCompleted">0 / 3000 Tasks Completed</div>
+  </header>
 
-<main>
-  <h1>Monetized Tasks (3000)</h1>
-  <p class="lead">Click a task → complete the Linkvertise step → you’ll be redirected to <code>verify.html?id=TASK</code>. After completing verification, it turns green and records the date/time of completion.</p>
-
-  <div id="tasks"></div>
-
-  <div id="redeem-section">
-    <h2>🎁 Redeem Tasks</h2>
-    <p>Thank you for your hard work! You can redeem rewards once you complete <strong>100 tasks</strong> or more.</p>
-    <button onclick="alert('Redemption feature coming soon!')">Redeem Now</button>
+  <div id="tutorial">
+    <a href="https://youtube.com/@linkvertise?si=SU07_HOoGAaDikok" target="_blank">
+      📘 How to complete a task
+    </a>
   </div>
-</main>
 
-<!-- Linkvertise -->
-<script src="https://publisher.linkvertise.com/cdn/linkvertise.js"></script>
-<script>
-try{linkvertise(1436408,{whitelist:[],blacklist:[]});}catch(e){}
-</script>
+  <div class="task-list" id="taskList"></div>
 
-<script>
-/* ---------- CONFIG ---------- */
-const TOTAL = 3000;
-const KEY_CODES = 'taskCodes';
-const KEY_VERIFIED = 'verifiedTasks';
-const KEY_TIME = 'verifiedTimes';
-const tasksEl = document.getElementById('tasks');
-const progressBarEl = document.getElementById('progress-bar');
-const counterEl = document.getElementById('taskCounter');
+  <script>
+    const totalTasks = 3000;
+    let completed = parseInt(localStorage.getItem("completedTasks")) || 0;
 
-/* ---------- LOAD ---------- */
-let taskCodes = JSON.parse(localStorage.getItem(KEY_CODES) || '{}');
-let verifiedTasks = JSON.parse(localStorage.getItem(KEY_VERIFIED) || '{}');
-let verifiedTimes = JSON.parse(localStorage.getItem(KEY_TIME) || '{}');
-let verifiedCount = Object.keys(verifiedTasks).length;
+    const taskList = document.getElementById("taskList");
+    const progressBar = document.getElementById("progressBar");
+    const tasksCompleted = document.getElementById("tasksCompleted");
+    const redeemButton = document.getElementById("redeemButton");
 
-/* ---------- DATETIME CLOCK ---------- */
-function updateClock(){
-  const now = new Date();
-  document.getElementById('datetime').textContent =
-    now.toLocaleDateString() + " " + now.toLocaleTimeString();
-}
-setInterval(updateClock, 1000);
-updateClock();
+    function updateDateTime() {
+      const now = new Date();
+      document.getElementById("dateTime").textContent = now.toLocaleString();
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 
-/* ---------- UI Updates ---------- */
-function updateProgressUI(){
-  const pct = Math.round((verifiedCount/TOTAL)*100);
-  progressBarEl.style.width = pct+"%";
-  progressBarEl.textContent = `${pct}% (${verifiedCount}/${TOTAL})`;
-  counterEl.textContent = `${verifiedCount} / ${TOTAL} completed`;
-}
+    function updateProgress() {
+      const percent = (completed / totalTasks) * 100;
+      progressBar.style.width = percent + "%";
+      tasksCompleted.textContent = `${completed} / ${totalTasks} Tasks Completed`;
+      if (completed >= totalTasks) {
+        redeemButton.disabled = false;
+        redeemButton.classList.add("active");
+      }
+      localStorage.setItem("completedTasks", completed);
+    }
 
-/* ---------- Mark Verified ---------- */
-function markVerified(id){
-  if(verifiedTasks[id]) return;
-  verifiedTasks[id] = true;
-  verifiedTimes[id] = new Date().toLocaleString();
-  localStorage.setItem(KEY_VERIFIED, JSON.stringify(verifiedTasks));
-  localStorage.setItem(KEY_TIME, JSON.stringify(verifiedTimes));
-  verifiedCount = Object.keys(verifiedTasks).length;
-
-  const card = document.getElementById('task-card-'+id);
-  if(card){
-    card.classList.add('done');
-    const right = card.querySelector('.right');
-    right.innerHTML = `<span class="verified-badge">Verified</span> <span class="time-stamp">${verifiedTimes[id]}</span>`;
-  }
-  updateProgressUI();
-}
-
-/* ---------- Build Tasks ---------- */
-for(let i=1;i<=TOTAL;i++){
-  const card = document.createElement('div');
-  card.className='task-card';
-  card.id='task-card-'+i;
-
-  const left=document.createElement('div');
-  const a=document.createElement('a');
-  a.className='tasklink';
-  a.href=`verify.html?id=${i}`;
-  a.target='_blank';
-  a.textContent=`Task ${i}`;
-  left.appendChild(a);
-
-  const input=document.createElement('input');
-  input.className='code';
-  input.id='input-'+i;
-  input.placeholder='Code';
-  left.appendChild(input);
-
-  const right=document.createElement('div');
-  right.className='right';
-
-  if(verifiedTasks[i]){
-    card.classList.add('done');
-    input.value=taskCodes[i]||'';
-    input.disabled=true;
-    right.innerHTML=`<span class="verified-badge">Verified</span> <span class="time-stamp">${verifiedTimes[i]||''}</span>`;
-  } else {
-    const btn=document.createElement('button');
-    btn.className='verify';
-    btn.textContent='Verify';
-    btn.addEventListener('click',()=>{
-      const entered=(input.value||'').trim();
-      if(taskCodes[i] && entered===taskCodes[i]){
-        markVerified(i);
-      } else {
-        btn.textContent='Invalid';
-        setTimeout(()=>btn.textContent='Verify',800);
+    redeemButton.addEventListener("click", () => {
+      if (completed >= totalTasks) {
+        alert("🎉 Congratulations! You’ve earned ₹300!");
       }
     });
-    right.appendChild(btn);
-  }
 
-  card.appendChild(left);
-  card.appendChild(right);
-  tasksEl.appendChild(card);
-}
+    for (let i = 1; i <= totalTasks; i++) {
+      const div = document.createElement("div");
+      div.classList.add("task");
+      if (i <= completed) div.classList.add("completed");
 
-/* ---------- Auto verify handler ---------- */
-(function(){
-  const p=new URLSearchParams(location.search);
-  const auto=p.get('autoVerify');
-  const id=p.get('id');
-  if(auto==='1' && id){
-    taskCodes=JSON.parse(localStorage.getItem(KEY_CODES)||'{}');
-    if(taskCodes[id]){
-      const inp=document.getElementById('input-'+id);
-      if(inp) inp.value=taskCodes[id];
-      markVerified(id);
-      history.replaceState(null,'',location.pathname);
-      setTimeout(()=>alert(`Task ${id} verified.`),300);
+      const taskLink = document.createElement("button");
+      taskLink.textContent = "Open Task " + i;
+      taskLink.addEventListener("click", () => {
+        window.open("https://linkvertise.com/verify.html?task=" + i, "_blank");
+        div.classList.add("completed");
+        completed++;
+        updateProgress();
+
+        // Save the completion time
+        const now = new Date().toLocaleString();
+        div.querySelector(".task-time").textContent = now;
+      });
+
+      const timeSpan = document.createElement("span");
+      timeSpan.classList.add("task-time");
+      timeSpan.style.fontSize = "12px";
+      timeSpan.style.color = "#555";
+      timeSpan.textContent = i <= completed ? new Date().toLocaleString() : "";
+
+      div.appendChild(taskLink);
+      div.appendChild(timeSpan);
+      taskList.appendChild(div);
     }
-  }
-})();
 
-/* ---------- Cross-tab sync ---------- */
-window.addEventListener('storage',e=>{
-  if(e.key===KEY_CODES) taskCodes=JSON.parse(e.newValue||'{}');
-  if(e.key===KEY_VERIFIED) {
-    verifiedTasks=JSON.parse(e.newValue||'{}');
-    verifiedCount=Object.keys(verifiedTasks).length;
-    updateProgressUI();
-  }
-});
-
-updateProgressUI();
-</script>
+    updateProgress();
+  </script>
 </body>
 </html>

@@ -12,7 +12,6 @@
     --muted:#555;
     --accent:#1976d2;
     --green:#2e7d32;
-    --blue:#1976d2;
   }
   body{
     font-family: "Inter", system-ui, sans-serif;
@@ -23,42 +22,43 @@
     scroll-behavior:smooth;
   }
 
-  /* Header */
-  header{
+  /* ---------- Top Green Header ---------- */
+  .top-section{
     background:var(--green);
     color:#fff;
-    padding:12px 18px;
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    justify-content:center;
-    gap:15px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    padding:16px;
+    text-align:center;
+  }
+  .top-section h2{
+    margin:0;
+    font-size:22px;
   }
   #datetime{
     font-weight:600;
-    font-size:15px;
+    font-size:16px;
   }
   #taskCounter{
     background:#fff;
     color:var(--green);
-    padding:8px 14px;
+    padding:6px 14px;
     border-radius:50px;
     font-weight:700;
-    box-shadow:0 2px 8px rgba(255,255,255,0.25);
+    display:inline-block;
+    margin-top:10px;
   }
   #progress-container{
-    width:420px;
-    max-width:70vw;
-    height:26px;
-    background:#e6ecf5;
+    width:90%;
+    max-width:500px;
+    height:22px;
+    background:#d0d7df;
     border-radius:20px;
+    margin:10px auto;
     overflow:hidden;
   }
   #progress-bar{
     height:100%;
     width:0%;
-    background:linear-gradient(90deg,#2196f3,#64b5f6);
+    background:linear-gradient(90deg,#1976d2,#42a5f5);
     color:#fff;
     font-size:13px;
     display:flex;
@@ -67,22 +67,23 @@
     font-weight:700;
     transition:width 0.4s ease;
   }
-  #redeemBtn{
+  .top-buttons{
+    margin-top:10px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .top-buttons button,
+  .top-buttons a{
     background:#fff;
     color:var(--green);
     border:none;
-    padding:10px 18px;
-    font-weight:700;
-    border-radius:30px;
-    cursor:pointer;
-  }
-  #redeemBtn:hover{
-    background:#e8f5e9;
-  }
-  #howTo{
-    color:#fff;
+    padding:8px 14px;
+    border-radius:8px;
     font-weight:600;
-    text-decoration:underline;
+    cursor:pointer;
+    text-decoration:none;
   }
 
   main{
@@ -90,9 +91,8 @@
     margin:20px auto;
     padding:10px 20px 100px;
   }
-  h1{margin-top:0;}
-  p.lead{color:var(--muted)}
 
+  /* ---------- Task grid ---------- */
   #tasks{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
@@ -113,6 +113,7 @@
     background:#e7f9ed;
     border-color:#81c784;
   }
+
   a.tasklink{
     padding:6px 12px;
     background:#fff;
@@ -151,30 +152,28 @@
   }
 
   @media (max-width:600px){
-    header{flex-direction:column;gap:8px;text-align:center;}
-    #progress-container{width:80vw;}
     .task-card{flex-direction:column;align-items:flex-start;}
   }
 </style>
 </head>
 <body>
 
-<header>
+<div class="top-section">
+  <h2>3000 Linkvertise Tasks Dashboard</h2>
   <div id="datetime"></div>
   <div id="taskCounter">0 / 3000 completed</div>
   <div id="progress-container"><div id="progress-bar">0%</div></div>
-  <button id="redeemBtn">💸 Redeem ₹300</button>
-  <a id="howTo" href="https://youtube.com/@linkvertise?si=SU07_HOoGAaDikok" target="_blank">How to complete a task</a>
-</header>
+  <div class="top-buttons">
+    <button id="redeemBtn">Redeem ₹300</button>
+    <a href="https://youtube.com/@linkvertise?si=SU07_HOoGAaDikok" target="_blank">How to Complete a Task</a>
+  </div>
+</div>
 
 <main>
-  <h1>Monetized Tasks (3000)</h1>
-  <p class="lead">Click a task → complete the Linkvertise step → you’ll be redirected to <code>verify.html?id=TASK</code>. After completing verification, it turns green and records the date/time of completion.</p>
-
   <div id="tasks"></div>
 </main>
 
-<!-- Linkvertise -->
+<!-- Linkvertise Script -->
 <script src="https://publisher.linkvertise.com/cdn/linkvertise.js"></script>
 <script>
 try{linkvertise(1436408,{whitelist:[],blacklist:[]});}catch(e){}
@@ -189,7 +188,6 @@ const KEY_TIME = 'verifiedTimes';
 const tasksEl = document.getElementById('tasks');
 const progressBarEl = document.getElementById('progress-bar');
 const counterEl = document.getElementById('taskCounter');
-const redeemBtn = document.getElementById('redeemBtn');
 
 let taskCodes = JSON.parse(localStorage.getItem(KEY_CODES) || '{}');
 let verifiedTasks = JSON.parse(localStorage.getItem(KEY_VERIFIED) || '{}');
@@ -212,7 +210,6 @@ function updateProgressUI(){
   progressBarEl.textContent = `${pct}% (${verifiedCount}/${TOTAL})`;
   counterEl.textContent = `${verifiedCount} / ${TOTAL} completed`;
 }
-updateProgressUI();
 
 /* ---------- Mark Verified ---------- */
 function markVerified(id){
@@ -232,12 +229,11 @@ function markVerified(id){
   updateProgressUI();
 }
 
-/* ---------- Lazy Load Tasks ---------- */
+/* ---------- Build Tasks (Lazy Loading) ---------- */
 let loaded = 0;
 function loadMoreTasks(){
-  if(loaded >= TOTAL) return;
   const end = Math.min(loaded + BATCH, TOTAL);
-  for(let i = loaded + 1; i <= end; i++){
+  for(let i=loaded+1;i<=end;i++){
     const card = document.createElement('div');
     card.className='task-card';
     card.id='task-card-'+i;
@@ -286,32 +282,26 @@ function loadMoreTasks(){
   }
   loaded = end;
 }
+
+/* Lazy loading scroll */
+window.addEventListener('scroll',()=>{
+  if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 200){
+    if(loaded < TOTAL) loadMoreTasks();
+  }
+});
+
 loadMoreTasks();
 
-/* Scroll detection for lazy load */
-window.addEventListener('scroll', ()=>{
-  if(window.innerHeight + window.scrollY >= document.body.scrollHeight - 100){
-    loadMoreTasks();
-  }
-});
-
-/* ---------- Redeem button ---------- */
-redeemBtn.addEventListener('click',()=>{
+/* ---------- Redeem Button ---------- */
+document.getElementById('redeemBtn').addEventListener('click',()=>{
   if(verifiedCount < TOTAL){
-    alert('⚠️ You can redeem only after completing all 3000 tasks.');
+    alert("You can redeem only after completing all tasks.");
   } else {
-    alert('✅ Message "link vertise" to this number: 7075726388');
+    alert('Message "link vertise" to this number: 7075726388');
   }
 });
 
-/* ---------- Cross-tab sync ---------- */
-window.addEventListener('storage',e=>{
-  if(e.key===KEY_VERIFIED){
-    verifiedTasks=JSON.parse(e.newValue||'{}');
-    verifiedCount=Object.keys(verifiedTasks).length;
-    updateProgressUI();
-  }
-});
+updateProgressUI();
 </script>
 </body>
 </html>

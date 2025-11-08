@@ -12,6 +12,7 @@
     --muted:#555;
     --accent:#1976d2;
     --green:#43a047;
+    --blue:#1976d2;
   }
   body{
     font-family: "Inter", system-ui, sans-serif;
@@ -22,79 +23,10 @@
     scroll-behavior:smooth;
   }
 
-  /* ---------- Added Top Green Section ---------- */
-  .top-green{
+  /* ---------- HEADER TOP BAR ---------- */
+  #top-header{
     background:var(--green);
     color:#fff;
-    text-align:center;
-    padding:16px 10px;
-  }
-  .top-green h1{
-    margin:0;
-    font-size:22px;
-    font-weight:700;
-  }
-  .top-green #datetime{
-    font-size:15px;
-    font-weight:500;
-    margin-top:5px;
-  }
-  .top-green #taskCounter{
-    background:#fff;
-    color:var(--green);
-    padding:6px 14px;
-    border-radius:50px;
-    font-weight:700;
-    display:inline-block;
-    margin-top:8px;
-  }
-  .top-green #progress-container{
-    width:90%;
-    max-width:500px;
-    height:22px;
-    background:#c8e6c9;
-    border-radius:20px;
-    margin:10px auto;
-    overflow:hidden;
-  }
-  .top-green #progress-bar{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#2196f3,#64b5f6);
-    color:#fff;
-    font-size:13px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    transition:width 0.4s ease;
-  }
-  .top-buttons{
-    margin-top:8px;
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:8px;
-  }
-  .top-buttons button,
-  .top-buttons a{
-    background:#fff;
-    color:var(--green);
-    border:none;
-    padding:6px 12px;
-    border-radius:8px;
-    font-weight:600;
-    cursor:pointer;
-    text-decoration:none;
-  }
-
-  /* Existing header kept unchanged */
-  header{
-    position:sticky;
-    top:0;
-    z-index:1000;
-    background:#fff;
-    border-bottom:1px solid #ddd;
     padding:12px 18px;
     display:flex;
     flex-wrap:wrap;
@@ -102,11 +34,54 @@
     justify-content:center;
     gap:15px;
     box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    font-weight:600;
   }
-  #datetime-old{display:none;} /* old datetime hidden to prevent duplication */
-  #taskCounter-old{display:none;}
-  #progress-container-old{display:none;}
+  #top-header div, #top-header button, #top-header a{
+    font-weight:600;
+  }
+  #datetime{
+    min-width:140px;
+  }
+  #taskCounter{
+    background:#fff;
+    color:var(--green);
+    padding:6px 12px;
+    border-radius:50px;
+  }
+  #progress-container{
+    width:250px;
+    height:20px;
+    background:#e6ecf5;
+    border-radius:20px;
+    overflow:hidden;
+  }
+  #progress-bar{
+    height:100%;
+    width:0%;
+    background:var(--blue);
+    color:#fff;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    transition:width 0.4s ease;
+  }
+  #top-header button{
+    background:#fff;
+    color:var(--green);
+    border:none;
+    padding:6px 12px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  #top-header a{
+    color:#fff;
+    text-decoration:underline;
+    cursor:pointer;
+  }
 
+  /* ---------- MAIN CONTENT ---------- */
   main{
     max-width:1200px;
     margin:20px auto;
@@ -185,7 +160,7 @@
   }
 
   @media (max-width:600px){
-    header{flex-direction:column;gap:8px;}
+    #top-header{flex-direction:column;gap:8px;}
     #progress-container{width:80vw;}
     .task-card{flex-direction:column;align-items:flex-start;}
   }
@@ -193,24 +168,14 @@
 </head>
 <body>
 
-<!-- ✅ Added Top Green Section -->
-<div class="top-green">
-  <h1>3000 Linkvertise Tasks Dashboard</h1>
+<!-- ---------- TOP HEADER ---------- -->
+<div id="top-header">
   <div id="datetime"></div>
   <div id="taskCounter">0 / 3000 completed</div>
   <div id="progress-container"><div id="progress-bar">0%</div></div>
-  <div class="top-buttons">
-    <button id="redeemBtn">Redeem ₹300</button>
-    <a href="https://youtube.com/@linkvertise?si=SU07_HOoGAaDikok" target="_blank">How to Complete a Task</a>
-  </div>
+  <button id="redeemBtn">Redeem ₹300</button>
+  <a href="https://youtube.com/@linkvertise?si=30WMzgilaPPyXb_G" target="_blank">How to complete a task</a>
 </div>
-
-<!-- Original header (kept) -->
-<header>
-  <div id="datetime-old"></div>
-  <div id="taskCounter-old">0 / 3000 completed</div>
-  <div id="progress-container-old"><div id="progress-bar-old">0%</div></div>
-</header>
 
 <main>
   <h1>Monetized Tasks (3000)</h1>
@@ -220,8 +185,8 @@
 
   <div id="redeem-section">
     <h2>🎁 Redeem Tasks</h2>
-    <p>Thank you for your hard work! You can redeem rewards once you complete <strong>3000 tasks</strong>.</p>
-    <button id="redeemBtn2">Redeem Now</button>
+    <p>Thank you for your hard work! You can redeem rewards once you complete <strong>100 tasks</strong> or more.</p>
+    <button onclick="alert('Redemption feature coming soon!')">Redeem Now</button>
   </div>
 </main>
 
@@ -331,16 +296,41 @@ for(let i=1;i<=TOTAL;i++){
   tasksEl.appendChild(card);
 }
 
-/* ---------- Redeem Buttons ---------- */
-function handleRedeem(){
-  if(verifiedCount < TOTAL){
-    alert("You can redeem only after completing all tasks.");
-  } else {
-    alert('Message "link vertise" to this number: 7075726388');
+/* ---------- Auto verify handler ---------- */
+(function(){
+  const p=new URLSearchParams(location.search);
+  const auto=p.get('autoVerify');
+  const id=p.get('id');
+  if(auto==='1' && id){
+    taskCodes=JSON.parse(localStorage.getItem(KEY_CODES)||'{}');
+    if(taskCodes[id]){
+      const inp=document.getElementById('input-'+id);
+      if(inp) inp.value=taskCodes[id];
+      markVerified(id);
+      history.replaceState(null,'',location.pathname);
+      setTimeout(()=>alert(`Task ${id} verified.`),300);
+    }
   }
-}
-document.getElementById('redeemBtn').addEventListener('click',handleRedeem);
-document.getElementById('redeemBtn2').addEventListener('click',handleRedeem);
+})();
+
+/* ---------- Cross-tab sync ---------- */
+window.addEventListener('storage',e=>{
+  if(e.key===KEY_CODES) taskCodes=JSON.parse(e.newValue||'{}');
+  if(e.key===KEY_VERIFIED) {
+    verifiedTasks=JSON.parse(e.newValue||'{}');
+    verifiedCount=Object.keys(verifiedTasks).length;
+    updateProgressUI();
+  }
+});
+
+/* ---------- Redeem Button ---------- */
+document.getElementById('redeemBtn').addEventListener('click',()=>{
+  if(verifiedCount===TOTAL){
+    alert('Message "link vertise" to this number 7075726388');
+  } else {
+    alert('You can redeem only after completing all tasks');
+  }
+});
 
 updateProgressUI();
 </script>

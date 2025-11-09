@@ -159,10 +159,33 @@
     text-align:center;
   }
 
+  /* ---------- Floating Refresh Button ---------- */
+  #refreshBtn {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--blue);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 28px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 2000;
+    transition: all 0.25s ease;
+  }
+  #refreshBtn:hover {
+    background: #1254a1;
+    transform: translateX(-50%) scale(1.05);
+  }
+
   @media (max-width:600px){
     #top-header{flex-direction:column;gap:8px;}
     #progress-container{width:80vw;}
     .task-card{flex-direction:column;align-items:flex-start;}
+    #refreshBtn{padding:12px 22px;font-size:14px;}
   }
 </style>
 </head>
@@ -189,6 +212,9 @@
     <button onclick="alert('you can redeem after completing 3000 tasks')">Redeem Now</button>
   </div>
 </main>
+
+<!-- Floating Refresh Button -->
+<button id="refreshBtn" onclick="refreshTasks()">🔄 Refresh Tasks</button>
 
 <!-- Linkvertise -->
 <script src="https://publisher.linkvertise.com/cdn/linkvertise.js"></script>
@@ -247,7 +273,7 @@ function markVerified(id){
   updateProgressUI();
 }
 
-/* ---------- Build Tasks ---------- */
+/* ---------- Build Tasks (UNCHANGED original loop) ---------- */
 for(let i=1;i<=TOTAL;i++){
   const card = document.createElement('div');
   card.className='task-card';
@@ -296,6 +322,25 @@ for(let i=1;i<=TOTAL;i++){
   tasksEl.appendChild(card);
 }
 
+/* ---------- Refresh Tasks: move unverified first, verified to bottom (DOM-only, preserves events) ---------- */
+function refreshTasks(){
+  // Collect current child nodes
+  const children = Array.from(tasksEl.children);
+  const unverified = [];
+  const verified = [];
+  children.forEach(node=>{
+    if(node.classList.contains('task-card') && node.id){
+      const id = node.id.replace('task-card-','');
+      if(verifiedTasks[id]) verified.push(node);
+      else unverified.push(node);
+    }
+  });
+  // Clear container and append unverified then verified
+  tasksEl.innerHTML = '';
+  unverified.forEach(n => tasksEl.appendChild(n));
+  verified.forEach(n => tasksEl.appendChild(n));
+}
+
 /* ---------- Auto verify handler ---------- */
 (function(){
   const p=new URLSearchParams(location.search);
@@ -336,4 +381,3 @@ updateProgressUI();
 </script>
 </body>
 </html>
-

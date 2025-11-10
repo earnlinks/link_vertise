@@ -44,7 +44,7 @@
   taskInfoDiv.textContent = 'Task Number: ' + taskId;
 
   // Wait before generating code (simulate verification delay)
-  const delayMs = 0000; // 5 seconds
+  const delayMs = 0; // instant
   setTimeout(() => {
     const code = String(Math.floor(100 + Math.random()*900)); // 100..999
     const KEY_CODES = 'taskCodes';
@@ -55,9 +55,11 @@
     document.getElementById('codeBox').textContent = `Your code for Task ${taskId}: ${code}`;
     const btn = document.getElementById('verifyAuto');
     btn.disabled = false;
-    btn.addEventListener('click', () => {
+
+    // ✅ Auto-verify and redirect to index.html
+    setTimeout(() => {
       location.href = 'index.html?autoVerify=1&id=' + encodeURIComponent(taskId);
-    });
+    }, 1000); // wait 1 second before redirect for smoother UX
   }, delayMs);
 
   document.getElementById('returnBtn').addEventListener('click', () => {
@@ -69,10 +71,12 @@
   const existing = JSON.parse(localStorage.getItem(KEY_CODES) || '{}');
   if (existing[taskId]) {
     document.getElementById('codeBox').textContent = `Your code for Task ${taskId}: ${existing[taskId]}`;
-    document.getElementById('verifyAuto').disabled = false;
+    // ✅ Auto-verify instantly if already verified before
+    setTimeout(() => {
+      location.href = 'index.html?autoVerify=1&id=' + encodeURIComponent(taskId);
+    }, 1000);
   }
 })();
 </script>
 </body>
 </html>
-

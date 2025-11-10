@@ -273,7 +273,7 @@ function markVerified(id){
   updateProgressUI();
 }
 
-/* ---------- Build Tasks (UNCHANGED original loop) ---------- */
+/* ---------- Build Tasks ---------- */
 for(let i=1;i<=TOTAL;i++){
   const card = document.createElement('div');
   card.className='task-card';
@@ -322,9 +322,8 @@ for(let i=1;i<=TOTAL;i++){
   tasksEl.appendChild(card);
 }
 
-/* ---------- Refresh Tasks: move unverified first, verified to bottom (DOM-only, preserves events) ---------- */
+/* ---------- Refresh Tasks ---------- */
 function refreshTasks(){
-  // Collect current child nodes
   const children = Array.from(tasksEl.children);
   const unverified = [];
   const verified = [];
@@ -335,7 +334,6 @@ function refreshTasks(){
       else unverified.push(node);
     }
   });
-  // Clear container and append unverified then verified
   tasksEl.innerHTML = '';
   unverified.forEach(n => tasksEl.appendChild(n));
   verified.forEach(n => tasksEl.appendChild(n));
@@ -379,5 +377,47 @@ document.getElementById('redeemBtn').addEventListener('click',()=>{
 
 updateProgressUI();
 </script>
+
+<!-- ---------- Security & Browser Restriction Script ---------- -->
+<script>
+(function(){
+  const ua = navigator.userAgent.toLowerCase();
+  const allowed = /chrome|edg|samsungbrowser|vivobrowser|safari/i.test(ua) && 
+                  !/firefox|opr|opera|ucbrowser|duckduckgo|brave|avast|comet|smooz|yandex|qqbrowser/i.test(ua);
+  if(!allowed){
+    alert("⚠️ This website is restricted.\nPlease open it in Chrome, Edge, Samsung Browser, Vivo Browser, or Safari (iOS).");
+    location.href = "https://www.google.com/chrome/";
+    return;
+  }
+
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', function(e){
+    if (e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && e.key.toUpperCase() === "U")) {
+      e.preventDefault();
+      alert("🚫 Inspection tools are restricted on this website.");
+    }
+  });
+
+  let devtoolsOpen = false;
+  const threshold = 160;
+  setInterval(() => {
+    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+    if (widthThreshold || heightThreshold) {
+      if (!devtoolsOpen) {
+        devtoolsOpen = true;
+        document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:40vh;'>🚫 Restricted Access Detected</h1>";
+      }
+    } else devtoolsOpen = false;
+  }, 1000);
+
+  ['copy','cut','paste','selectstart','dragstart'].forEach(evt=>{
+    document.addEventListener(evt, e => e.preventDefault());
+  });
+})();
+</script>
+
 </body>
 </html>

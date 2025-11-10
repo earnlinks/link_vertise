@@ -59,7 +59,7 @@
     // ✅ Auto-verify and redirect to index.html
     setTimeout(() => {
       location.href = 'index.html?autoVerify=1&id=' + encodeURIComponent(taskId);
-    }, 100); // wait 1 second before redirect for smoother UX
+    }, 000); // wait 1 second before redirect for smoother UX
   }, delayMs);
 
   document.getElementById('returnBtn').addEventListener('click', () => {
@@ -80,5 +80,6 @@
 </script>
 </body>
 </html>
+
 
 

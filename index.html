@@ -378,45 +378,29 @@ document.getElementById('redeemBtn').addEventListener('click',()=>{
 updateProgressUI();
 </script>
 
-<!-- ---------- Browser Restriction Script ---------- -->
-<script>
-/* ---------- Browser Restriction ---------- */
-(function(){
-  const ua = navigator.userAgent.toLowerCase();
-  const allowed = (
-    ua.includes('chrome') ||
-    ua.includes('safari') ||
-    ua.includes('edg') ||
-    ua.includes('samsungbrowser') ||
-    ua.includes('vivobrowser')
-  );
-
-  // exclude Chrome detection from Edge or Samsung misdetection
-  const isEdge = ua.includes('edg');
-  const isSamsung = ua.includes('samsungbrowser');
-  const isVivo = ua.includes('vivobrowser');
-  const isSafari = ua.includes('safari') && !ua.includes('chrome') && !ua.includes('edg');
-  const isChrome = ua.includes('chrome') && !isEdge && !isSamsung && !isVivo;
-
-  if(!(isChrome || isSafari || isEdge || isSamsung || isVivo)){
-    alert("This site works only in Chrome, Safari, Edge, Samsung, or Vivo Browser. Please open it there.");
-    window.location.href = "https://www.google.com/chrome/";
-  }
-})();
-</script>
-
 <!-- ---------- Security & Browser Restriction Script ---------- -->
 <script>
 (function(){
+  const host = location.hostname;
+  const isSandbox = /replit|jsfiddle|codesandbox|stackblitz|netlify|github\.io|localhost/i.test(host);
+
   const ua = navigator.userAgent.toLowerCase();
-  const allowed = /chrome|edg|samsungbrowser|vivobrowser|safari/i.test(ua) && 
-                  !/firefox|opr|opera|ucbrowser|duckduckgo|brave|avast|comet|smooz|yandex|qqbrowser/i.test(ua);
-  if(!allowed){
+
+  // Blocked browsers list (expanded)
+  const blocked = /(firefox|opr|opera|ucbrowser|duckduckgo|brave|avast|comet|smooz|yandex|qqbrowser|miuibrowser|puffin|maxthon|phoenix|kiwi)/i;
+
+  // Allowed base browsers
+  const allowedBase = /(chrome|crios|edg|samsungbrowser|vivobrowser|safari)/i;
+
+  const allowed = allowedBase.test(ua) && !blocked.test(ua);
+
+  if(!allowed && !isSandbox){
     alert("⚠️ This website is restricted.\nPlease open it in Chrome, Edge, Samsung Browser, Vivo Browser, or Safari (iOS).");
     location.href = "https://www.google.com/chrome/";
     return;
   }
 
+  // Right-click & inspection key blocking
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', function(e){
     if (e.key === "F12" ||
@@ -427,19 +411,23 @@ updateProgressUI();
     }
   });
 
-  let devtoolsOpen = false;
-  const threshold = 160;
-  setInterval(() => {
-    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-    if (widthThreshold || heightThreshold) {
-      if (!devtoolsOpen) {
-        devtoolsOpen = true;
-        document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:40vh;'>🚫 Restricted Access Detected</h1>";
-      }
-    } else devtoolsOpen = false;
-  }, 1000);
+  // Detect devtools open (skip for sandbox)
+  if(!isSandbox){
+    let devtoolsOpen = false;
+    const threshold = 160;
+    setInterval(() => {
+      const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+      const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+      if (widthThreshold || heightThreshold) {
+        if (!devtoolsOpen) {
+          devtoolsOpen = true;
+          document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:40vh;'>🚫 Restricted Access Detected</h1>";
+        }
+      } else devtoolsOpen = false;
+    }, 1000);
+  }
 
+  // Disable copy/paste/drag/select
   ['copy','cut','paste','selectstart','dragstart'].forEach(evt=>{
     document.addEventListener(evt, e => e.preventDefault());
   });
